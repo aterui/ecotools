@@ -1,3 +1,12 @@
+#' Resample function
+#'
+#' @param x Vector
+#' @param ... Additional arguments passed to \code{sample}
+#'
+#' @export
+
+resample <- function(x, ...) x[sample.int(length(x), ...)]
+
 #' Yield partial derivatives
 #'
 #' @param r Numeric. Intrinsic growth rate of species i.

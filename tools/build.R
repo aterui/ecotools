@@ -1,0 +1,21 @@
+
+# build package -----------------------------------------------------------
+
+usethis::use_mit_license(copyright_holder = "Akira Terui")
+usethis::use_roxygen_md()
+devtools::document()
+devtools::load_all()
+devtools::check(vignettes=FALSE)
+
+
+# check syntax ------------------------------------------------------------
+
+lintr::lint_package()
+
+# build website -----------------------------------------------------------
+
+# Run once to configure package to use pkgdown
+#usethis::use_pkgdown()
+
+# Run to build the website
+pkgdown::build_site()
