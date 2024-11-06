@@ -41,10 +41,15 @@ findr <- function(alpha,
   if (length(theta) != 1 && length(theta) != n_basal)
     stop("'theta' must be a scalar or have length of the number of basal species")
 
-  if (theta <= 0)
+  if (any(theta <= 0))
     stop("'theta' must be positive")
 
-  p_k <- MCMCpack::rdirichlet(1, alpha = rep(theta, n_basal))
+  if (length(theta) == 1) {
+    p_k <- drop(MCMCpack::rdirichlet(1, alpha = rep(theta, n_basal)))
+  } else {
+    p_k <- drop(MCMCpack::rdirichlet(1, alpha = theta))
+  }
+
   f_k <- k0 * p_k
 
   # trophic position
