@@ -23,13 +23,17 @@ to_alpha(
 \arguments{
 \item{alpha0}{Numeric matrix. \code{n_species x n_species} interaction matrix}
 
-\item{competition}{List for competition coefficients between producers. Specify minimum and maximum values for a uniform distribution.}
+\item{competition}{List for competition coefficients between producers.
+Specify minimum and maximum values for a uniform distribution.}
 
-\item{attack}{List for attack rates. Specify minimum and maximum values for a uniform distribution.}
+\item{attack}{List for attack rates.
+Specify minimum and maximum values for a uniform distribution.}
 
-\item{convert}{List for conversion efficiency. Specify minimum and maximum values for a uniform distribution.}
+\item{convert}{List for conversion efficiency.
+Specify minimum and maximum values for a uniform distribution.}
 
-\item{regulation}{List for self regulation (or intraspecific competition). Specify minimum and maximum values for a uniform distribution.}
+\item{regulation}{List for self regulation (or intraspecific competition).
+Specify minimum and maximum values for a uniform distribution.}
 }
 \description{
 Apply conversion efficiency and attack rate

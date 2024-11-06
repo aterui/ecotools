@@ -17,7 +17,8 @@ Number of basal species}
 Expected number of links in the upper triangle}
 
 \item{theta}{Numeric.
-Scale parameter of an exponential distribution. Smaller values indicate greater trophic specialization.}
+Scale parameter of an exponential distribution.
+Smaller values indicate greater trophic specialization.}
 
 \item{cannibal}{Logical.
 If \code{TRUE}, cannibalism allowed}

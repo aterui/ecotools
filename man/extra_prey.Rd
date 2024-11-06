@@ -18,7 +18,8 @@ extra_prey(alpha0, j, i0, tp, theta, kappa, cannibal = FALSE)
 \item{tp}{Numeric. Initial trophic positions}
 
 \item{theta}{Numeric.
-Scale parameter of an exponential distribution. Smaller values indicate greater trophic specialization.}
+Scale parameter of an exponential distribution.
+Smaller values indicate greater trophic specialization.}
 
 \item{kappa}{Integer. Number of extra prey items}
 

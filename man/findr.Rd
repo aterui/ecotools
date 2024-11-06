@@ -22,10 +22,12 @@ findr(
 Total carrying capacity for basal species combined}
 
 \item{theta}{Numeric.
-Shape parameter for a Dirichlet distribution that determines relative equilibrium densities of basal species}
+Shape parameter of the Dirichlet distribution,
+which defines the relative equilibrium densities of basal species.}
 
 \item{lambda0}{Numeric.
-Initial lambda value for the exponential decay of equilibrium densities with trophic position}
+Initial value of a rate parameter for the exponential decay
+of equilibrium densities with trophic position.}
 
 \item{interval}{Numeric.
 Increment of lambda value.}

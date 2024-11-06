@@ -5,9 +5,11 @@
 #' @param k0 Numeric.
 #'  Total carrying capacity for basal species combined
 #' @param theta Numeric.
-#'  Shape parameter for a Dirichlet distribution that determines relative equilibrium densities of basal species
+#'  Shape parameter of the Dirichlet distribution,
+#'  which defines the relative equilibrium densities of basal species.
 #' @param lambda0 Numeric.
-#'  Initial lambda value for the exponential decay of equilibrium densities with trophic position
+#'  Initial value of a rate parameter for the exponential decay
+#'  of equilibrium densities with trophic position.
 #' @param interval Numeric.
 #'  Increment of lambda value.
 #' @param sigma Numeric.
@@ -63,7 +65,7 @@ findr <- function(alpha,
 
   # initialize lambda and r
   lambda <- lambda0
-  eps <- exp(rnorm(n_c, mean = 0, sd = sigma))
+  eps <- exp(stats::rnorm(n_c, mean = 0, sd = sigma))
 
   x <- w_k0 * exp(-lambda * (tp - 1))
   x[-id_basal] <- x[-id_basal] * eps
@@ -99,7 +101,8 @@ findr <- function(alpha,
 #' @param l Integer.
 #'  Expected number of links in the upper triangle
 #' @param theta Numeric.
-#'  Scale parameter of an exponential distribution. Smaller values indicate greater trophic specialization.
+#'  Scale parameter of an exponential distribution.
+#'  Smaller values indicate greater trophic specialization.
 #' @param cannibal Logical.
 #'  If \code{TRUE}, cannibalism allowed
 #' @param lower_tri Logical.

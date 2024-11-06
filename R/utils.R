@@ -177,10 +177,14 @@ extra_prey <- function(alpha0,
 #' Apply conversion efficiency and attack rate
 #'
 #' @inheritParams extra_prey
-#' @param competition List for competition coefficients between producers. Specify minimum and maximum values for a uniform distribution.
-#' @param attack List for attack rates. Specify minimum and maximum values for a uniform distribution.
-#' @param convert List for conversion efficiency. Specify minimum and maximum values for a uniform distribution.
-#' @param regulation List for self regulation (or intraspecific competition). Specify minimum and maximum values for a uniform distribution.
+#' @param competition List for competition coefficients between producers.
+#'  Specify minimum and maximum values for a uniform distribution.
+#' @param attack List for attack rates.
+#'  Specify minimum and maximum values for a uniform distribution.
+#' @param convert List for conversion efficiency.
+#'  Specify minimum and maximum values for a uniform distribution.
+#' @param regulation List for self regulation (or intraspecific competition).
+#'  Specify minimum and maximum values for a uniform distribution.
 #'
 #' @author Akira Terui, \email{hanabi0111@gmail.com}
 #'

@@ -27,18 +27,23 @@ Number of basal species}
 Expected number of links in the upper triangle}
 
 \item{theta}{Numeric.
-Scale parameter of an exponential distribution. Smaller values indicate greater trophic specialization.}
+Scale parameter of an exponential distribution.
+Smaller values indicate greater trophic specialization.}
 
 \item{cannibal}{Logical.
 If \code{TRUE}, cannibalism allowed}
 
-\item{competition}{List for competition coefficients between producers. Specify minimum and maximum values for a uniform distribution.}
+\item{competition}{List for competition coefficients between producers.
+Specify minimum and maximum values for a uniform distribution.}
 
-\item{attack}{List for attack rates. Specify minimum and maximum values for a uniform distribution.}
+\item{attack}{List for attack rates.
+Specify minimum and maximum values for a uniform distribution.}
 
-\item{convert}{List for conversion efficiency. Specify minimum and maximum values for a uniform distribution.}
+\item{convert}{List for conversion efficiency.
+Specify minimum and maximum values for a uniform distribution.}
 
-\item{regulation}{List for self regulation (or intraspecific competition). Specify minimum and maximum values for a uniform distribution.}
+\item{regulation}{List for self regulation (or intraspecific competition).
+Specify minimum and maximum values for a uniform distribution.}
 }
 \description{
 Generate a food web based on the preferential prey model
