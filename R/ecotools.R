@@ -121,6 +121,7 @@ ppm <- function(n_species,
   # theta: scale parameter
 
   # verify inputs
+  if (n_species < 3) stop("At least three species needed")
   if (n_basal < 1) stop("At least one basal species needed to construct a food web")
   if (n_basal >= n_species) stop("n_basal must be smaller than n_species")
 
