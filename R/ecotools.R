@@ -427,6 +427,7 @@ foodweb <- function(n_species,
 #' @param n_species Integer. Number of species.
 #' @param r Numeric vector.
 #'  Intrinsic growth rates for modeled species.
+#'  Should be provided in log-scale regardless of model type (incliding Beverton-Holt)
 #' @param x0 Numeric vector.
 #'  Equilibrium densities for modeled species.
 #' @param alpha Numeric matrix.
