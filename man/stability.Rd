@@ -10,7 +10,8 @@ stability(n_species, r, x0, alpha, model = "glv")
 \item{n_species}{Integer. Number of species.}
 
 \item{r}{Numeric vector.
-Intrinsic growth rates for modeled species.}
+Intrinsic growth rates for modeled species.
+Should be provided in log-scale regardless of model type (incliding Beverton-Holt)}
 
 \item{x0}{Numeric vector.
 Equilibrium densities for modeled species.}
