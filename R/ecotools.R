@@ -449,6 +449,9 @@ stability <- function(n_species,
 
   # check input -------------------------------------------------------------
 
+  if (!is.matrix(alpha))
+    stop("alpha must be a matrix")
+
   if (any(unique(dim(alpha)) != n_species))
     stop("dimension mismatch in alpha")
 
@@ -501,6 +504,10 @@ stability <- function(n_species,
         ## calculate x0 from alpha and r
         x0 <- drop(solve(alpha) %*% (exp(r) - 1))
       }
+
+      if (any(alpha < 0))
+        message("Negative value(s) in alpha.
+                Negative alpha in a Beverton-Holt model is not competition.")
     }
 
     ## check negative equilibrium
