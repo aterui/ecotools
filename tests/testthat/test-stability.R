@@ -108,22 +108,25 @@ for (n_species in n_species_list) {
 
     r <- drop(-(A %*% x0))
 
-    # Jacobian
-    J <- t(sapply(seq_len(n_species), function(i) {
-      fun_partial(r = r[i],
-                  a = A[i, ],
-                  x0 = x0,
-                  i = i,
-                  model = "glv")
-    }))
+    # GLV Jacobian: J[i,j] = x0[i] * A[i,j] if i != j, J[i,i] = r[i] + sum(A[i,] * x0) + x0[i] * A[i,i]
+    J <- matrix(0, n_species, n_species)
+    for (i in seq_len(n_species)) {
+      for (j in seq_len(n_species)) {
+        if (i == j) {
+          J[i, j] <- r[i] + sum(A[i, ] * x0) + x0[i] * A[i, j]
+        } else {
+          J[i, j] <- x0[i] * A[i, j]
+        }
+      }
+    }
 
-    lm_max0 <- max(eigen(J)$values)
+    lm_max0 <- max(Re(eigen(J)$values))
     lm_max1 <- stability(n_species = n_species,
                          r = r,
                          x0 = x0,
                          alpha = A,
                          model = "glv")
-    lm_max1 <- c(lm_max1) # remove attributes
+    lm_max1 <- c(lm_max1)
 
     expect_equal(lm_max0, lm_max1, tolerance = 1e-6)
   })
@@ -132,15 +135,21 @@ for (n_species in n_species_list) {
 
     r <- drop(-(A %*% x0))
 
-    J <- t(sapply(seq_len(n_species), function(i) {
-      fun_partial(r = r[i],
-                  a = A[i, ],
-                  x0 = x0,
-                  i = i,
-                  model = "ricker")
-    }))
+    # Ricker Jacobian: J[i,j] = x0[i] * A[i,j] * exp(r[i] + sum(A[i,] * x0)) if i != j
+    #                J[i,i] = (1 + x0[i] * A[i,i]) * exp(r[i] + sum(A[i,] * x0))
+    J <- matrix(0, n_species, n_species)
+    for (i in seq_len(n_species)) {
+      ei <- exp(r[i] + sum(A[i, ] * x0))
+      for (j in seq_len(n_species)) {
+        if (i == j) {
+          J[i, j] <- (1 + x0[i] * A[i, j]) * ei
+        } else {
+          J[i, j] <- x0[i] * A[i, j] * ei
+        }
+      }
+    }
 
-    lm_max0 <- max(eigen(J)$values)
+    lm_max0 <- max(Mod(eigen(J)$values))
     lm_max1 <- stability(n_species = n_species,
                          r = r,
                          x0 = x0,
@@ -157,15 +166,20 @@ for (n_species in n_species_list) {
     lambda_vec <- 1 + A0 %*% x0
     r <- log(lambda_vec)
 
-    J <- t(sapply(seq_len(n_species), function(i) {
-      fun_partial(r = r[i],
-                  a = A0[i, ],
-                  x0 = x0,
-                  i = i,
-                  model = "bh")
-    }))
+    # BH Jacobian: J[i,j] = derivative of x[i] * exp(r[i]) / (1 + sum(A0[i,]*x)) w.r.t x[j]
+    J <- matrix(0, n_species, n_species)
+    for (i in seq_len(n_species)) {
+      denom <- 1 + sum(A0[i, ] * x0)
+      for (j in seq_len(n_species)) {
+        if (i == j) {
+          J[i, j] <- exp(r[i]) / denom - x0[i] * exp(r[i]) * A0[i, j] / denom^2
+        } else {
+          J[i, j] <- - x0[i] * exp(r[i]) * A0[i, j] / denom^2
+        }
+      }
+    }
 
-    lm_max0 <- max(eigen(J)$values)
+    lm_max0 <- max(Mod(eigen(J)$values))
     lm_max1 <- stability(n_species = n_species,
                          r = r,
                          x0 = x0,
