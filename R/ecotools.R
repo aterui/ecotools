@@ -471,7 +471,6 @@ foodweb <- function(n_species,
 #'
 #' @export
 
-
 stability <- function(n_species,
                       r,
                       x0,
