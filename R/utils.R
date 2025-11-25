@@ -269,9 +269,7 @@ to_alpha <- function(alpha0,
 #'
 #' @export
 
-fn_x0 <- function(model = c("glv", "ricker", "bh")) {
-
-  model <- match.arg(model)
+fn_x0 <- function(model) {
 
   ## transformation of r differs by model
   r_transform <- switch(model,
@@ -321,9 +319,7 @@ fn_x0 <- function(model = c("glv", "ricker", "bh")) {
 #'
 #' @export
 
-fn_r <- function(model = c("glv", "ricker", "bh")) {
-
-  model <- match.arg(model)
+fn_r <- function(model) {
 
   compute_r <- switch(model,
                       glv = function(alpha, x0) {
