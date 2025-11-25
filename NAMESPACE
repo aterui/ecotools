@@ -2,8 +2,10 @@
 
 export(extra_prey)
 export(findr)
+export(fn_partial)
+export(fn_r)
+export(fn_x0)
 export(foodweb)
-export(fun_partial)
 export(ppm)
 export(resample)
 export(stability)

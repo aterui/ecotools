@@ -2,30 +2,58 @@
 % Please edit documentation in R/ecotools.R
 \name{stability}
 \alias{stability}
-\title{Calculate a leading eigenvalue}
+\title{Calculate the leading eigenvalue of a community Jacobian}
 \usage{
-stability(n_species, r, x0, alpha, model = "glv")
+stability(n_species, r, x0, alpha, model = c("glv", "ricker", "bh"))
 }
 \arguments{
-\item{n_species}{Integer. Number of species.}
+\item{n_species}{Integer.
+Number of species in the modeled community.}
 
-\item{r}{Numeric vector.
-Intrinsic growth rates for modeled species.
-Should be provided in log-scale regardless of model type (incliding Beverton-Holt)}
+\item{r}{Numeric vector (optional).
+Intrinsic growth rates.
+Should be provided on the log scale for all model types,
+including Beverton–Holt.}
 
-\item{x0}{Numeric vector.
-Equilibrium densities for modeled species.}
+\item{x0}{Numeric vector (optional).
+Equilibrium densities. If missing, they are computed from \code{r}
+and \code{alpha}. If supplied, all values must be non-negative.}
 
 \item{alpha}{Numeric matrix.
-Interaction matrix for which linear stability is evaluated.}
+Interaction matrix used to compute the Jacobian and equilibrium.
+Must be square with dimension \verb{n_species × n_species}.}
 
-\item{model}{Character string specifying a model type.
-Either \code{"ricker"} (Ricker),
-\code{"bh"} (Beverton-Holt), or
-\code{"glv"} (Generalized Lotka-Volterra).}
+\item{model}{Character string.
+Population model:
+\itemize{
+\item \code{"glv"} — Generalized Lotka–Volterra
+\item \code{"ricker"} — Ricker model
+\item \code{"bh"} — Beverton–Holt model
+}}
+}
+\value{
+A numeric value giving the leading eigenvalue, with attributes
+\code{"jacobian"}, \code{"r"}, and \code{"x0"}.
 }
 \description{
-Calculate a leading eigenvalue
+This function evaluates local stability of an ecological community
+by computing the leading eigenvalue of the Jacobian matrix
+derived from a chosen population model (GLV, Ricker, or Beverton–Holt).
+}
+\details{
+Users may supply either intrinsic growth rates (\code{r}) \strong{or}
+equilibrium densities (\code{x0}); the missing quantity is inferred using
+the specified model. Stability is assessed at the equilibrium.
+
+The function returns the leading eigenvalue (dominant real part for
+continuous-time GLV; dominant modulus for discrete Ricker/BH models).
+
+Additional attributes stored on the returned value:
+\itemize{
+\item \code{"jacobian"} — the Jacobian matrix
+\item \code{"r"} — intrinsic growth rates used in the calculation
+\item \code{"x0"} — equilibrium densities
+}
 }
 \author{
 Akira Terui, \email{hanabi0111@gmail.com}
