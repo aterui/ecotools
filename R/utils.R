@@ -325,7 +325,6 @@ fn_r <- function(model = c("glv", "ricker", "bh")) {
 
   model <- match.arg(model)
 
-  ## transformation of r differs by model
   compute_r <- switch(model,
                       glv = function(alpha, x0) {
                         drop(-alpha %*% x0)
