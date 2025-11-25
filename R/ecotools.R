@@ -492,7 +492,7 @@ stability <- function(n_species,
   if (!missing(x0) && length(x0) != n_species)
     stop("Dimension mismatch: length of 'x0' must equal number of species")
 
-  model <- model.arg(model)
+  model <- match.arg(model)
 
   # get maximum absolute eigenvalue -----------------------------------------
 
