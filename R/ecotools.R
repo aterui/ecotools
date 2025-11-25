@@ -422,123 +422,117 @@ foodweb <- function(n_species,
   return(alpha)
 }
 
-#' Calculate a leading eigenvalue
+#' Calculate the leading eigenvalue of a community Jacobian
 #'
-#' @param n_species Integer. Number of species.
-#' @param r Numeric vector.
-#'  Intrinsic growth rates for modeled species.
-#'  Should be provided in log-scale regardless of model type (incliding Beverton-Holt)
-#' @param x0 Numeric vector.
-#'  Equilibrium densities for modeled species.
+#' This function evaluates local stability of an ecological community
+#' by computing the leading eigenvalue of the Jacobian matrix
+#' derived from a chosen population model (GLV, Ricker, or Beverton–Holt).
+#'
+#' Users may supply either intrinsic growth rates (`r`) **or**
+#' equilibrium densities (`x0`); the missing quantity is inferred using
+#' the specified model. Stability is assessed at the equilibrium.
+#'
+#' @param n_species Integer.
+#'   Number of species in the modeled community.
+#'
+#' @param r Numeric vector (optional).
+#'   Intrinsic growth rates.
+#'   Should be provided on the log scale for all model types,
+#'   including Beverton–Holt.
+#'
+#' @param x0 Numeric vector (optional).
+#'   Equilibrium densities. If missing, they are computed from `r`
+#'   and `alpha`. If supplied, all values must be non-negative.
+#'
 #' @param alpha Numeric matrix.
-#'  Interaction matrix for which linear stability is evaluated.
-#' @param model Character string specifying a model type.
-#'  Either \code{"ricker"} (Ricker),
-#'  \code{"bh"} (Beverton-Holt), or
-#'  \code{"glv"} (Generalized Lotka-Volterra).
+#'   Interaction matrix used to compute the Jacobian and equilibrium.
+#'   Must be square with dimension `n_species × n_species`.
+#'
+#' @param model Character string.
+#'   Population model:
+#'   * `"glv"` — Generalized Lotka–Volterra
+#'   * `"ricker"` — Ricker model
+#'   * `"bh"` — Beverton–Holt model
+#'
+#' @details
+#' The function returns the leading eigenvalue (dominant real part for
+#' continuous-time GLV; dominant modulus for discrete Ricker/BH models).
+#'
+#' Additional attributes stored on the returned value:
+#' * `"jacobian"` — the Jacobian matrix
+#' * `"r"` — intrinsic growth rates used in the calculation
+#' * `"x0"` — equilibrium densities
+#'
+#' @return
+#' A numeric value giving the leading eigenvalue, with attributes
+#' `"jacobian"`, `"r"`, and `"x0"`.
 #'
 #' @author Akira Terui, \email{hanabi0111@gmail.com}
 #'
 #' @export
 
+
 stability <- function(n_species,
                       r,
                       x0,
                       alpha,
-                      model = "glv") {
+                      model = c("glv", "ricker", "bh")) {
 
-  # check input -------------------------------------------------------------
+  ## ---- input checks ---------------------------------------------------------
 
   if (!is.matrix(alpha))
-    stop("alpha must be a matrix")
+    stop("'alpha' must be a matrix")
 
-  if (any(unique(dim(alpha)) != n_species))
-    stop("dimension mismatch in alpha")
+  if (!all(dim(alpha) == n_species))
+    stop("Dimension mismatch: 'alpha' must be a ", n_species, " x ", n_species, " matrix")
 
-  if (!missing(r)) {
-    if (length(r) != n_species)
-      stop("dimension mismatch in alpha or r")
-  }
+  if (!missing(r) && length(r) != n_species)
+    stop("Dimension mismatch: length of 'r' must equal number of species")
 
-  if (!missing(x0)) {
-    if (length(x0) != n_species)
-      stop("dimension mismatch in alpha or x0")
-  }
+  if (!missing(x0) && length(x0) != n_species)
+    stop("Dimension mismatch: length of 'x0' must equal number of species")
 
+  model <- model.arg(model)
 
   # get maximum absolute eigenvalue -----------------------------------------
 
-  if (det(alpha) == 0) {
-    ## if det(alpha) = 0, return NA
-    max_lambda <- NA
+  if (det(alpha) == 0) return(NA)
 
-  } else {
+  fr <- fn_r(model)
+  fx0 <- fn_x0(model)
 
-    if (model == "ricker" || model == "glv") {
-      ## Ricker or GLV model
+  ## case 1: r missing, x0 provided
+  if (missing(r) && !missing(x0)) {
 
-      if (missing(r) && !missing(x0)) {
-        ## if equilibrium density provided,
-        ## calculate r from alpha and x0
-        r <- drop(-alpha %*% x0)
-      }
-
-      if (!missing(r) && missing(x0)) {
-        ## if intrinsic growth provided,
-        ## calculate x0 from alpha and r
-        x0 <- drop(-solve(alpha) %*% r)
-      }
-    }
-
-    if (model == "bh") {
-      ## Beverton-Holt model
-
-      if (missing(r) && !missing(x0)) {
-        ## if equilibrium density provided,
-        ## calculate r from alpha and x0
-        r <- drop(log(1 + alpha %*% x0))
-      }
-
-      if (!missing(r) && missing(x0)) {
-        ## if intrinsic growth provided,
-        ## calculate x0 from alpha and r
-        x0 <- drop(solve(alpha) %*% (exp(r) - 1))
-      }
-
-      if (any(alpha < 0))
-        message("Negative value(s) in alpha.
-                Negative alpha in a Beverton-Holt model is not competition.")
-    }
-
-    ## check negative equilibrium
     if (any(x0 < 0))
-      stop("Negative equilibrium density is not allowed")
+      stop("Negative equilibrium values are not allowed")
 
-    ## get Jacobian matrix
-    jm <- t(sapply(seq_len(n_species),
-                   function(i) {
-                     fun_partial(r = r[i],
-                                 a = alpha[i, ],
-                                 x0 = x0,
-                                 i = i,
-                                 model = model)
-                   }))
-
-    ## leading eigenvalue
-    lambda <- eigen(jm)
-
-    if (model == "ricker" || model == "bh") {
-      ## discrete models
-      max_lambda <- max(Mod(lambda$values))
-    } else {
-      ## continuous models
-      max_lambda <- max(Re(lambda$values))
-    }
-
-    attr(max_lambda, "jacobian") <- jm
-    attr(max_lambda, "r") <- r
-    attr(max_lambda, "x0") <- x0
+    r <- fr(alpha = alpha, x0 = x0)
   }
+
+  ## case 2: r provided, x0 missing
+  if (!missing(r) && missing(x0)) {
+
+    x0 <- fx0(r = r, alpha = alpha)
+  }
+
+  ## get Jacobian matrix
+  jm <- t(sapply(seq_len(n_species),
+                 function(i) {
+                   fun_partial(r = r[i],
+                               a = alpha[i, ],
+                               x0 = x0,
+                               i = i,
+                               model = model)
+                 }))
+
+  ## leading eigenvalue
+  lambda <- eigen(jm)
+
+  f <- if (model %in% c("ricker", "bh")) Mod else Re
+
+  max_lambda <- max(f(lambda$values)) |>
+    structure(jacobian = jm, r = r, x0 = x0)
 
   return(max_lambda)
 }
