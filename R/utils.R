@@ -255,3 +255,88 @@ to_alpha <- function(alpha0,
   return(alpha)
 }
 
+#' Equilibrium solver generator
+#'
+#' Returns a function that computes equilibrium abundances for a given
+#' intrinsic growth vector \code{r} and interaction matrix \code{alpha},
+#' using one of three population models: \code{"glv"}, \code{"ricker"}, or \code{"bh"}.
+#'
+#' @param model Character string specifying the model type.
+#'   One of \code{"glv"}, \code{"ricker"}, or \code{"bh"}.
+#'
+#' @return A function with arguments \code{r} and \code{alpha} that returns
+#'   the equilibrium vector \code{x0}.
+#'
+#' @export
+
+fn_x0 <- function(model = c("glv", "ricker", "bh")) {
+
+  model <- match.arg(model)
+
+  ## transformation of r differs by model
+  r_transform <- switch(model,
+                        # x0 = solve(alpha) %*% (-r)
+                        glv    = function(r) -r,
+                        ricker = function(r) -r,
+
+                        # x0 = solve(alpha) %*% (exp(r) - 1)
+                        bh     = function(r) exp(r) - 1
+  )
+
+  ## Main equilibrium solver shared by all models
+  compute_x0 <- function(r, alpha) {
+
+    if (det(alpha) == 0) return(NA)
+
+    # base equilibrium
+    rhs <- r_transform(r)
+    x0  <- drop(solve(alpha) %*% rhs)
+
+    # competitive exclusion adjustment
+    if (any(x0 < 0)) {
+
+      s_plus <- which(x0 > 0)
+      s_neg  <- which(x0 <= 0)
+
+      alpha_sub <- alpha[s_plus, s_plus]
+      r_sub     <- r[s_plus]
+
+      rhs_sub <- r_transform(r_sub)
+
+      x0[s_plus] <- drop(solve(alpha_sub) %*% rhs_sub)
+      x0[s_neg]  <- 0
+    }
+
+    x0
+  }
+
+  return(compute_x0)
+}
+
+#' Compute intrinsic growth rates for a given model
+#'
+#' @param model Model type: "glv", "ricker", or "bh".
+#'
+#' @return A function that computes r given alpha and x0.
+#'
+#' @export
+
+fn_r <- function(model = c("glv", "ricker", "bh")) {
+
+  model <- match.arg(model)
+
+  ## transformation of r differs by model
+  compute_r <- switch(model,
+                      glv = function(alpha, x0) {
+                        drop(-alpha %*% x0)
+                      },
+                      ricker = function(alpha, x0) {
+                        drop(-alpha %*% x0)
+                      },
+                      bh = function(alpha, x0) {
+                        log(1 + drop(alpha %*% x0))
+                      }
+  )
+
+  return(compute_r)
+}
