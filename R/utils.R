@@ -23,8 +23,6 @@ resample <- function(x, ...) x[sample.int(length(x), ...)]
 
 fn_partial <- function(r, a, i, x0, model) {
 
-  ## Ricker model
-  if (model == "ricker") {
   # check inputs
   if (!is.numeric(r) || length(r) != 1) stop("r must be a scalar numeric")
   if (!is.numeric(i) || length(i) != 1) stop("i must be a scalar numeric")
