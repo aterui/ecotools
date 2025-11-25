@@ -477,7 +477,7 @@ stability <- function(n_species,
                       alpha,
                       model = c("glv", "ricker", "bh")) {
 
-  ## ---- input checks ---------------------------------------------------------
+  # input checks ------------------------------------------------------------
 
   if (!is.matrix(alpha))
     stop("'alpha' must be a matrix")
