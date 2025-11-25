@@ -518,11 +518,11 @@ stability <- function(n_species,
   ## get Jacobian matrix
   jm <- t(sapply(seq_len(n_species),
                  function(i) {
-                   fun_partial(r = r[i],
-                               a = alpha[i, ],
-                               x0 = x0,
-                               i = i,
-                               model = model)
+                   fn_partial(r = r[i],
+                              a = alpha[i, ],
+                              x0 = x0,
+                              i = i,
+                              model = model)
                  }))
 
   ## leading eigenvalue

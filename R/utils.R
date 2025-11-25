@@ -7,102 +7,39 @@
 
 resample <- function(x, ...) x[sample.int(length(x), ...)]
 
-#' Yield partial derivatives
+#' Compute partial derivatives of a single-species growth function
+#'
+#' This function evaluates the Jacobian (partial derivatives) of a species-specific
+#' growth function at equilibrium densities, for GLV, Ricker, or Beverton-Holt models.
 #'
 #' @param r Numeric. Intrinsic growth rate of species i.
-#' @param a Numeric vector. Interaction coefficients.
-#' @param i Integer. Species numeric ID.
+#' @param a Numeric vector. Interaction coefficients of species i with all species.
+#' @param i Integer. Index of the focal species.
 #' @inheritParams stability
+#'
+#' @return Numeric matrix. Jacobian of the focal species' growth function w.r.t all species.
 #'
 #' @export
 
-fun_partial <- function(r, a, i, x0, model) {
-
-  # check input -------------------------------------------------------------
-  if (length(r) != 1)
-    stop(paste("Input 'r' must be a scalar:",
-               "'r' has length", length(r)))
-
-  if (length(i) != 1)
-    stop(paste("'i' must be a scalar:",
-               "'i' has length", length(i)))
-
-  if (length(a) != length(x0))
-    stop(paste("Invalid inputs in 'a' or 'x0':",
-               "'a' has length =", length(a),
-               "while 'x0' has length =", length(x0)))
-
-  if (!(model %in% c("ricker", "bh", "glv")))
-    stop(paste("Invalid model type: 'model' must be either of",
-               "'ricker', 'bh', or 'glv'"))
-
-  # model formula -----------------------------------------------------------
-  ## declare vectorized parameters and variables
-  v_a <- paste0("a[", seq_len(length(a)), "]")
-  v_x <- paste0("x[", seq_len(length(x0)), "]")
-  arg <- paste(c("r", "x", "a"), collapse = ", ")
-
-  ## linear combination
-  lcm <- paste(v_a, "*", v_x)
-
-  ## function
-  f <- NULL
-
-  ## Generalized Lotka-Volterra model
-  if (model == "glv") {
-    ## get a model formula
-    fm <- c("r", lcm)
-    m <- paste0("x[", i, "]", " * ",
-                "(",
-                paste(fm, collapse = " + "),
-                ")")
-
-    ## function text for evaluation
-    f_text <- parse(text = paste0("f <- function(", arg, ") {",
-                                  m,
-                                  "}"))
-
-    eval(f_text)
-  }
+fn_partial <- function(r, a, i, x0, model) {
 
   ## Ricker model
   if (model == "ricker") {
-    ## get a model formula
-    fm <- c("r", lcm)
-    m <- paste0("x[", i, "]", " * ",
-                "exp(",
-                paste(fm, collapse = " + "),
-                ")")
+  # check inputs
+  if (!is.numeric(r) || length(r) != 1) stop("r must be a scalar numeric")
+  if (!is.numeric(i) || length(i) != 1) stop("i must be a scalar numeric")
+  if (!is.numeric(a) || length(a) != length(x0)) stop("Length of 'a' and 'x0' must match")
 
-    ## function text for evaluation
-    f_text <- parse(text = paste0("f <- function(", arg, ") {",
-                                  m,
-                                  "}"))
+  # define model function
+  f <- switch(model,
+              glv    = function(x) x[i] * (r + sum(a * x)),
+              ricker = function(x) x[i] * exp(r + sum(a * x)),
+              bh     = function(x) x[i] * exp(r) / (1 + sum(a * x)),
+              stop("Unknown model"))
 
-    eval(f_text)
-  }
-
-  ## Beverton-Holt model
-  if (model == "bh") {
-    ## get a model formula
-    m <- paste0("x[", i, "]", " * ", "exp(r)",
-                " * ",
-                "(1 + ",
-                paste(lcm, collapse = " + "),
-                ") ** -1")
-
-    ## function text for evaluation
-    f_text <- parse(text = paste0("f <- function(", arg, ") {",
-                                  m,
-                                  "}"))
-
-    eval(f_text)
-  }
-
-  ## return partial derivatives evaluated at x0 (equilibrium)
-  return(pracma::jacobian(f, x0 = x0, r = r, a = a))
+  # return Jacobian evaluated at x0
+  pracma::jacobian(f, x0)
 }
-
 
 #' Extra prey function
 #'
