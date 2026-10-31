@@ -21,7 +21,9 @@ to_alpha(
 )
 }
 \arguments{
-\item{alpha0}{Numeric matrix. \code{n_species x n_species} interaction matrix}
+\item{alpha0}{Numeric matrix.
+Adjacency matrix (\code{n_species x n_species})
+defining trophic interactions}
 
 \item{competition}{List for competition coefficients between producers.
 Specify minimum and maximum values for a uniform distribution.}
