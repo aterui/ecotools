@@ -176,7 +176,7 @@ ppm <- function(n_species,
 
   # realized number of prey nodes for all consumers
   # kappa follows a beta-binomial distribution
-  # size parameter is the possible maximum number of prey nodes
+  # size parameter is the possible maximum number of "additional" prey nodes excluding initial prey choice
   if (cannibal) {
     v_kappa <- c(rep(-1, n_basal),
                  stats::rbinom(n = n_c,
@@ -212,6 +212,10 @@ ppm <- function(n_species,
   }
 
   if (lower_tri) {
+
+    if (cannibal)
+      stop("Use lower_tri = FALSE when cannibal = TRUE.")
+
     cout <- - alpha0 + t(alpha0)
   } else {
     cout <- - alpha0
